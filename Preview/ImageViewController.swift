@@ -7,16 +7,21 @@
 //
 
 import UIKit
-
+import AVFoundation
 
 class ImageViewController: UIViewController {
 
+    
+    // AVCaptureSession variables and properties
+    var captureSession = AVCaptureSession()
+    var previewLayer:AVCaptureVideoPreviewLayer?
+    var captureDevice:AVCaptureDevice?
     let overlay = UIView()
     var lastPoint = CGPoint.zero
-    
     var image:UIImage!
     @IBOutlet weak var imageView: UIImageView!
-
+    @IBOutlet weak var photoButton: UIButton!
+    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
@@ -25,17 +30,28 @@ class ImageViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+    
         navigationController?.isNavigationBarHidden = true
         // Do any additional setup after loading the view.
         overlay.layer.borderColor = UIColor.black.cgColor
-        overlay.backgroundColor = UIColor.clear.withAlphaComponent(0.5)
+        overlay.backgroundColor = UIColor.lightGray.withAlphaComponent(0.6)
         overlay.isHidden = true
         self.view.addSubview(overlay)
-        
+        photoButton.isHidden = true
+        photoButton.isEnabled = false
     }
     
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        
+        if previewLayer != nil {
+            previewLayer = nil
+        }
+        if captureDevice != nil {
+            captureDevice = nil
+        }
+        photoButton.isHidden = true
+        photoButton.isEnabled = false
         if let touch = touches.first {
             lastPoint = touch.location(in: imageView)
         }
@@ -50,8 +66,12 @@ class ImageViewController: UIViewController {
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         
+        // TODO: camera should open in the rectangle overlay area
         
+        photoButton.isHidden = false
+        photoButton.isEnabled = true
         
+        setUpCameraView(frame: overlay.frame)
     }
     
     
@@ -63,48 +83,72 @@ class ImageViewController: UIViewController {
         
     }
     
+    func configureDevice() {
+        var err : NSError? = nil
+        if let device = captureDevice {
+            do {
+                try device.lockForConfiguration()
+            } catch let error as NSError {
+                err = error
+                print(err!.localizedDescription)
+            }
+            device.focusMode = .locked
+            device.unlockForConfiguration()
+        }
+        
+    }
+    
+    func setUpCameraView(frame: CGRect) {
+        captureSession.sessionPreset = AVCaptureSessionPresetHigh
+        
+        
+        let devices = AVCaptureDevice.devices()
+        
+        // Loop through all the capture devices on this phone
+        for device in devices! {
+            // Make sure this particular device supports video
+            if ((device as AnyObject).hasMediaType(AVMediaTypeVideo)) {
+                // Finally check the position and confirm we've got the back camera
+                if((device as AnyObject).position == AVCaptureDevicePosition.back) {
+                    captureDevice = device as? AVCaptureDevice
+                    if captureDevice != nil {
+                        print("Capture device found")
+                        beginSession(frame: frame)
+                    }
+                }
+            }
+        }
+    }
+    
+    func beginSession(frame: CGRect) {
+        
+        configureDevice()
+        
+        var err : NSError? = nil
+        do {
+            try captureSession.addInput(AVCaptureDeviceInput(device: captureDevice))
+
+        } catch let error as NSError {
+            err = error
+            print(err!.localizedDescription)
+        }
+        
+        previewLayer = AVCaptureVideoPreviewLayer(session: captureSession)
+        self.imageView.layer.addSublayer(previewLayer!)
+        previewLayer?.frame = frame
+        captureSession.startRunning()
+    }
+
+    @IBAction func takePhoto(_ sender: UIButton) {
+        
+        
+    }
     
     
-//    override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
-//        
-//        //Save original tap Point
-//        if let touch = touches.first {
-//            lastPoint = touch.location(in: self.view)
-//        }
-//    }
-//    
-//    override func touchesMoved(touches: Set<UITouch>, withEvent event: UIEvent?) {
-//        //Get the current known point and redraw
-//        if let touch = touches.first {
-//            let currentPoint = touch.location(in: view)
-//            reDrawSelectionArea(fromPoint: lastPoint, toPoint: currentPoint)
-//        }
-//    }
-//    
-//    func reDrawSelectionArea(fromPoint: CGPoint, toPoint: CGPoint) {
-//        overlay.isHidden = false
-//        
-//        //Calculate rect from the original point and last known point
-//        let rect = CGRect(min(fromPoint.x, toPoint.x),
-//                              min(fromPoint.y, toPoint.y),
-//                              fabs(fromPoint.x - toPoint.x),
-//                              fabs(fromPoint.y - toPoint.y));
-//        
-//        overlay.frame = rect
-//    }
-//    
-//    override func touchesEnded(touches: Set<UITouch>, withEvent event: UIEvent?) {
-//        overlay.isHidden = true
-//        
-//        //User has lift his finger, use the rect
-//        applyFilterToSelectedArea(overlay.frame)
-//        
-//
-//        
-//        overlay.frame = RectZero //reset overlay for next tap
-//    }
 
     
 }
+
+
 
 
