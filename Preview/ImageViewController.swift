@@ -13,6 +13,10 @@ import Photos
 class ImageViewController: UIViewController {
 
     @IBOutlet weak var videoPreviewView: VideoPreviewView!
+    
+    @IBOutlet weak var zoomSlider: UISlider!
+    @IBOutlet weak var cropSlider: UISlider!
+    
     // AVCaptureSession variables and properties
     var captureSession:AVCaptureSession = AVCaptureSession()
     var capturePhotoOutput = AVCapturePhotoOutput()
@@ -67,10 +71,12 @@ class ImageViewController: UIViewController {
                         self.captureSession.startRunning()
                         
                         DispatchQueue.main.async {
+                            
                             self.setupGestureRecognizer()
                             self.videoPreviewView.updateVideoOrientationForDeviceOrientation()
                             self.videoPreviewView.alpha = 1.0
                             self.videoPreviewView.session = self.captureSession
+                            self.zoomSlider.isEnabled = true
                         }
                         
                     })
@@ -286,4 +292,38 @@ class ImageViewController: UIViewController {
         videoPreviewView.addGestureRecognizer(scaleVideoPreviewViewPinchGestureRecognizer)
     }
 
+    @IBAction func zoom(_ sender: UISlider) {
+        
+        var device = defaultDevice()
+        var error:NSError!
+        do {
+            try device.lockForConfiguration()
+            defer {device.unlockForConfiguration()}
+            if CGFloat(sender.value) <= (device.activeFormat.videoMaxZoomFactor) {
+                device.videoZoomFactor = CGFloat(sender.value)
+                
+            } else {
+                print("Unable to set zoom: (max: \(device.maxAvailableVideoZoomFactor), asked: \(CGFloat(sender.value))")
+            }
+        } catch error as NSError {
+            print("Unable to set zoom: \(error.localizedDescription)")
+        } catch _ {
+            
+        }
+    }
+    
+    @IBAction func crop(_ sender: UISlider) {
+        
+        DispatchQueue.main.async {
+            let frame = CGRect(x: self.videoPreviewView.frame.origin.x,
+                               y: self.videoPreviewView.frame.origin.y,
+                               width: self.videoPreviewView.frame.size.width,
+                               height: self.videoPreviewView.frame.size.height+CGFloat(sender.value))
+            self.videoPreviewView.frame = frame
+        }
+        
+        
+    }
+    
+    
 }
