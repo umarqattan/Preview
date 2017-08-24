@@ -16,7 +16,7 @@ class ImageViewController: UIViewController {
     
     @IBOutlet weak var zoomSlider: UISlider!
     @IBOutlet weak var cropSlider: UISlider!
-    
+    @IBOutlet weak var trimStepper: UIStepper!
     // AVCaptureSession variables and properties
     var captureSession:AVCaptureSession = AVCaptureSession()
     var capturePhotoOutput = AVCapturePhotoOutput()
@@ -77,6 +77,7 @@ class ImageViewController: UIViewController {
                             self.videoPreviewView.alpha = 1.0
                             self.videoPreviewView.session = self.captureSession
                             self.zoomSlider.isEnabled = true
+                            self.trimStepper.isEnabled = true
                         }
                         
                     })
@@ -324,6 +325,22 @@ class ImageViewController: UIViewController {
         
         
     }
+    
+    @IBAction func trim(_ sender: UIStepper) {
+        
+        DispatchQueue.main.async {
+        
+            
+            let frame = CGRect(x: self.videoPreviewView.frame.origin.x,
+                               y: self.videoPreviewView.frame.origin.y,
+                               width: self.videoPreviewView.frame.size.width,
+                               height: self.videoPreviewView.frame.size.height+CGFloat(sender.value))
+            self.videoPreviewView.frame = frame
+        }
+        
+        
+    }
+    
     
     
 }

@@ -69,6 +69,12 @@
                                     <action selector="crop:" destination="BYZ-38-t0r" eventType="valueChanged" id="bIa-yX-ehA"/>
                                 </connections>
                             </slider>
+                            <stepper opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" enabled="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" minimumValue="-100" maximumValue="100" stepValue="10" translatesAutoresizingMaskIntoConstraints="NO" id="6mG-23-UmZ">
+                                <rect key="frame" x="140" y="580" width="94" height="29"/>
+                                <connections>
+                                    <action selector="trim:" destination="BYZ-38-t0r" eventType="valueChanged" id="JeQ-TP-kPN"/>
+                                </connections>
+                            </stepper>
                         </subviews>
                         <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
@@ -78,12 +84,15 @@
                             <constraint firstItem="ZEP-hP-eNM" firstAttribute="bottom" secondItem="wfy-db-euE" secondAttribute="top" id="cVy-O1-8Xt"/>
                             <constraint firstItem="bL6-tQ-qgN" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" id="fgR-HA-aPS"/>
                             <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="bL6-tQ-qgN" secondAttribute="bottom" constant="21" id="iI8-ZR-G36"/>
+                            <constraint firstItem="bL6-tQ-qgN" firstAttribute="top" secondItem="6mG-23-UmZ" secondAttribute="bottom" constant="8" symbolic="YES" id="nKi-Ju-kbB"/>
                             <constraint firstItem="ZEP-hP-eNM" firstAttribute="top" secondItem="8bC-Xf-vdC" secondAttribute="top" id="s6l-oe-XgY"/>
+                            <constraint firstItem="6mG-23-UmZ" firstAttribute="centerX" secondItem="bL6-tQ-qgN" secondAttribute="centerX" id="yjB-ea-CcR"/>
                         </constraints>
                     </view>
                     <connections>
                         <outlet property="cropSlider" destination="bL6-tQ-qgN" id="Ixd-Sh-eKV"/>
                         <outlet property="imageView" destination="ZEP-hP-eNM" id="YVy-E8-zfi"/>
+                        <outlet property="trimStepper" destination="6mG-23-UmZ" id="KaH-XB-qfD"/>
                         <outlet property="videoPreviewView" destination="ta3-Q4-yc7" id="DWg-68-vLO"/>
                         <outlet property="zoomSlider" destination="X3H-k3-BaC" id="pGB-HV-v0c"/>
                     </connections>
