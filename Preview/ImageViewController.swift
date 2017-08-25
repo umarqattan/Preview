@@ -13,16 +13,15 @@ import Photos
 class ImageViewController: UIViewController {
 
     @IBOutlet weak var videoPreviewView: VideoPreviewView!
+    @IBOutlet weak var optionSegmentedControl: UISegmentedControl!
     
-    @IBOutlet weak var zoomSlider: UISlider!
-    @IBOutlet weak var cropSlider: UISlider!
-    @IBOutlet weak var trimStepper: UIStepper!
     // AVCaptureSession variables and properties
     var captureSession:AVCaptureSession = AVCaptureSession()
     var capturePhotoOutput = AVCapturePhotoOutput()
     var isCaptureSessionConfigured = false // Instance property on this view controller class
     var dragVideoPreviewViewPanGestureRecognizer:UIPanGestureRecognizer!
     var scaleVideoPreviewViewPinchGestureRecognizer:UIPinchGestureRecognizer!
+    var zoomVideoPreviewViewPinchGestureRecognizer:UIPinchGestureRecognizer!
     
     private let sessionQueue = DispatchQueue(label: "session queue",
                                              attributes: [],
@@ -72,12 +71,11 @@ class ImageViewController: UIViewController {
                         
                         DispatchQueue.main.async {
                             
-                            self.setupGestureRecognizer()
+                            self.setupMoveGesture()
                             self.videoPreviewView.updateVideoOrientationForDeviceOrientation()
                             self.videoPreviewView.alpha = 1.0
                             self.videoPreviewView.session = self.captureSession
-                            self.zoomSlider.isEnabled = true
-                            self.trimStepper.isEnabled = true
+                            
                         }
                         
                     })
@@ -276,7 +274,6 @@ class ImageViewController: UIViewController {
             deltaScale = min(deltaScale, maxScale/currentScale)
             deltaScale = max(deltaScale, minScale/currentScale)
 
-            //let zoomTransform = CGAffineTransform.scaledBy(CGAffineTransform(scaleX: deltaScale, y: deltaScale))
             gestureRecognizer.view?.transform = gestureRecognizer.view!.transform.scaledBy(x:deltaScale, y:deltaScale)
             gestureRecognizer.scale = 1
             
@@ -284,15 +281,86 @@ class ImageViewController: UIViewController {
         
     }
     
-    func setupGestureRecognizer() {
-        
+    @objc func handlePinch2(_ gestureRecognizer:UIPinchGestureRecognizer) {
+        if gestureRecognizer.state == .began || gestureRecognizer.state == .changed {
+           
+            let pinchVelocityDividerFactor:CGFloat = 5.0
+            var device = defaultDevice()
+            var error:NSError!
+        do {
+            try device.lockForConfiguration()
+            defer { device.unlockForConfiguration() }
+            
+            let desiredZoomFactor = device.videoZoomFactor + CGFloat(atan2f(Float(gestureRecognizer.velocity), Float(pinchVelocityDividerFactor)))
+            device.videoZoomFactor = max(1.0, min(desiredZoomFactor, device.activeFormat.videoMaxZoomFactor))
+            device.unlockForConfiguration()
+            } catch let error {
+                print("Error: \(error.localizedDescription)")
+                //print("Unable to set zoom: (max: \(device.maxAvailableVideoZoomFactor), asked: \(CGFloat(sender.value))")
+            }
+        }
+    }
+    
+    
+    func setupZoomGesture() {
+        zoomVideoPreviewViewPinchGestureRecognizer = UIPinchGestureRecognizer(target: self, action: #selector(ImageViewController.handlePinch2(_:)))
+        view.addGestureRecognizer(zoomVideoPreviewViewPinchGestureRecognizer)
+    }
+    
+    func setupMoveGesture() {
         dragVideoPreviewViewPanGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(ImageViewController.handlePan(_:)))
         scaleVideoPreviewViewPinchGestureRecognizer = UIPinchGestureRecognizer(target: self, action: #selector(ImageViewController.handlePinch(_ :)))
         
         videoPreviewView.addGestureRecognizer(dragVideoPreviewViewPanGestureRecognizer)
         videoPreviewView.addGestureRecognizer(scaleVideoPreviewViewPinchGestureRecognizer)
     }
+    
+    func tearDownZoomGesture() {
+        
+        view.gestureRecognizers = nil
+       
+    }
+    
+    func tearDownMoveGesture() {
+        
+        videoPreviewView.gestureRecognizers = nil
+    }
+    
+//    func setupGestureRecognizer() {
+//
+//        dragVideoPreviewViewPanGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(ImageViewController.handlePan(_:)))
+//        scaleVideoPreviewViewPinchGestureRecognizer = UIPinchGestureRecognizer(target: self, action: #selector(ImageViewController.handlePinch(_ :)))
+//
+//        videoPreviewView.addGestureRecognizer(dragVideoPreviewViewPanGestureRecognizer)
+//        videoPreviewView.addGestureRecognizer(scaleVideoPreviewViewPinchGestureRecognizer)
+//
+//    }
 
+    @IBAction func changeOption(_ sender: UISegmentedControl) {
+        
+        switch sender.selectedSegmentIndex {
+        case 0:
+                print("zoom to move")
+                 
+                setupMoveGesture()
+                tearDownZoomGesture()
+            break
+        case 1:
+                print("move to zoom")
+               
+                setupZoomGesture()
+                tearDownMoveGesture()
+            break
+        default:
+            break
+        }
+        
+     
+        
+        
+    }
+    
+    
     @IBAction func zoom(_ sender: UISlider) {
         
         var device = defaultDevice()
@@ -313,33 +381,11 @@ class ImageViewController: UIViewController {
         }
     }
     
-    @IBAction func crop(_ sender: UISlider) {
-        
-        DispatchQueue.main.async {
-            let frame = CGRect(x: self.videoPreviewView.frame.origin.x,
-                               y: self.videoPreviewView.frame.origin.y,
-                               width: self.videoPreviewView.frame.size.width,
-                               height: self.videoPreviewView.frame.size.height+CGFloat(sender.value))
-            self.videoPreviewView.frame = frame
-        }
-        
-        
-    }
     
-    @IBAction func trim(_ sender: UIStepper) {
-        
-        DispatchQueue.main.async {
-        
-            
-            let frame = CGRect(x: self.videoPreviewView.frame.origin.x,
-                               y: self.videoPreviewView.frame.origin.y,
-                               width: self.videoPreviewView.frame.size.width,
-                               height: self.videoPreviewView.frame.size.height+CGFloat(sender.value))
-            self.videoPreviewView.frame = frame
-        }
-        
-        
-    }
+    
+    
+    
+
     
     
     

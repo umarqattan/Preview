@@ -43,58 +43,43 @@
                             <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="ZEP-hP-eNM">
                                 <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                             </imageView>
-                            <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ta3-Q4-yc7" customClass="VideoPreviewView" customModule="Preview" customModuleProvider="target">
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ta3-Q4-yc7" customClass="VideoPreviewView" customModule="Preview" customModuleProvider="target">
                                 <rect key="frame" x="67" y="213" width="240" height="240"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                             </view>
-                            <slider opaque="NO" contentMode="scaleToFill" fixedFrame="YES" enabled="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="1" minValue="1" maxValue="10" translatesAutoresizingMaskIntoConstraints="NO" id="X3H-k3-BaC">
-                                <rect key="frame" x="-263" y="350" width="600" height="30"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <userDefinedRuntimeAttributes>
-                                    <userDefinedRuntimeAttribute type="number" keyPath="layer.transform.rotation.z">
-                                        <real key="value" value="-1.571"/>
-                                    </userDefinedRuntimeAttribute>
-                                </userDefinedRuntimeAttributes>
-                                <connections>
-                                    <action selector="zoom:" destination="BYZ-38-t0r" eventType="valueChanged" id="AlU-wo-ZBl"/>
-                                </connections>
-                            </slider>
-                            <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" minValue="-50" maxValue="50" translatesAutoresizingMaskIntoConstraints="NO" id="bL6-tQ-qgN">
-                                <rect key="frame" x="14" y="617" width="347" height="30"/>
+                            <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="jqt-8s-85W">
+                                <rect key="frame" x="67" y="620" width="240" height="28"/>
                                 <constraints>
-                                    <constraint firstAttribute="height" constant="29" id="ZNI-tT-dUI"/>
+                                    <constraint firstAttribute="height" constant="27" id="Vyw-9e-vfS"/>
                                 </constraints>
+                                <segments>
+                                    <segment title="Move"/>
+                                    <segment title="Zoom"/>
+                                </segments>
                                 <connections>
-                                    <action selector="crop:" destination="BYZ-38-t0r" eventType="valueChanged" id="bIa-yX-ehA"/>
+                                    <action selector="changeOption:" destination="BYZ-38-t0r" eventType="valueChanged" id="JHt-WO-K2a"/>
                                 </connections>
-                            </slider>
-                            <stepper opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" enabled="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" minimumValue="-100" maximumValue="100" stepValue="10" translatesAutoresizingMaskIntoConstraints="NO" id="6mG-23-UmZ">
-                                <rect key="frame" x="140" y="580" width="94" height="29"/>
-                                <connections>
-                                    <action selector="trim:" destination="BYZ-38-t0r" eventType="valueChanged" id="JeQ-TP-kPN"/>
-                                </connections>
-                            </stepper>
+                            </segmentedControl>
                         </subviews>
                         <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
-                            <constraint firstItem="ZEP-hP-eNM" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" id="DRi-O9-KnZ"/>
-                            <constraint firstItem="bL6-tQ-qgN" firstAttribute="centerX" secondItem="ZEP-hP-eNM" secondAttribute="centerX" id="LeZ-Zu-Gqk"/>
-                            <constraint firstAttribute="trailing" secondItem="ZEP-hP-eNM" secondAttribute="trailing" id="RjR-dX-IUL"/>
-                            <constraint firstItem="ZEP-hP-eNM" firstAttribute="bottom" secondItem="wfy-db-euE" secondAttribute="top" id="cVy-O1-8Xt"/>
-                            <constraint firstItem="bL6-tQ-qgN" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" id="fgR-HA-aPS"/>
-                            <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="bL6-tQ-qgN" secondAttribute="bottom" constant="21" id="iI8-ZR-G36"/>
-                            <constraint firstItem="bL6-tQ-qgN" firstAttribute="top" secondItem="6mG-23-UmZ" secondAttribute="bottom" constant="8" symbolic="YES" id="nKi-Ju-kbB"/>
-                            <constraint firstItem="ZEP-hP-eNM" firstAttribute="top" secondItem="8bC-Xf-vdC" secondAttribute="top" id="s6l-oe-XgY"/>
-                            <constraint firstItem="6mG-23-UmZ" firstAttribute="centerX" secondItem="bL6-tQ-qgN" secondAttribute="centerX" id="yjB-ea-CcR"/>
+                            <constraint firstItem="ZEP-hP-eNM" firstAttribute="top" secondItem="8bC-Xf-vdC" secondAttribute="top" id="1Dt-15-ahh"/>
+                            <constraint firstItem="ta3-Q4-yc7" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" constant="51" id="7ou-wT-La3"/>
+                            <constraint firstItem="ZEP-hP-eNM" firstAttribute="centerY" secondItem="ta3-Q4-yc7" secondAttribute="centerY" id="CIx-MG-yt6"/>
+                            <constraint firstItem="ta3-Q4-yc7" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" constant="193" id="EoB-vd-Uhs"/>
+                            <constraint firstItem="ZEP-hP-eNM" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" id="OiS-oH-vLG"/>
+                            <constraint firstItem="jqt-8s-85W" firstAttribute="leading" secondItem="ta3-Q4-yc7" secondAttribute="leading" id="cZ4-cs-jjE"/>
+                            <constraint firstItem="ZEP-hP-eNM" firstAttribute="centerX" secondItem="ta3-Q4-yc7" secondAttribute="centerX" id="kz5-yl-iLU"/>
+                            <constraint firstAttribute="trailing" secondItem="ZEP-hP-eNM" secondAttribute="trailing" id="lSQ-DX-Qaw"/>
+                            <constraint firstItem="jqt-8s-85W" firstAttribute="trailing" secondItem="ta3-Q4-yc7" secondAttribute="trailing" id="luE-QH-AtF"/>
+                            <constraint firstItem="ZEP-hP-eNM" firstAttribute="bottom" secondItem="wfy-db-euE" secondAttribute="top" id="ouI-C1-KtN"/>
+                            <constraint firstAttribute="bottom" secondItem="jqt-8s-85W" secondAttribute="bottom" constant="20" symbolic="YES" id="tO3-c6-qjQ"/>
                         </constraints>
                     </view>
                     <connections>
-                        <outlet property="cropSlider" destination="bL6-tQ-qgN" id="Ixd-Sh-eKV"/>
                         <outlet property="imageView" destination="ZEP-hP-eNM" id="YVy-E8-zfi"/>
-                        <outlet property="trimStepper" destination="6mG-23-UmZ" id="KaH-XB-qfD"/>
+                        <outlet property="optionSegmentedControl" destination="jqt-8s-85W" id="1b1-h0-MjX"/>
                         <outlet property="videoPreviewView" destination="ta3-Q4-yc7" id="DWg-68-vLO"/>
-                        <outlet property="zoomSlider" destination="X3H-k3-BaC" id="pGB-HV-v0c"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
