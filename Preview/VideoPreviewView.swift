@@ -10,8 +10,6 @@ import Foundation
 import AVFoundation
 import UIKit
 
-
-
 class VideoPreviewView: UIView {
     
     var videoPreviewLayer: AVCaptureVideoPreviewLayer {
@@ -64,5 +62,12 @@ class VideoPreviewView: UIView {
         }
         
     }
+    
+    
+    
+    
+    
+    
+    
     
 }

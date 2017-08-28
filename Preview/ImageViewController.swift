@@ -22,17 +22,20 @@ class ImageViewController: UIViewController {
     var dragVideoPreviewViewPanGestureRecognizer:UIPanGestureRecognizer!
     var scaleVideoPreviewViewPinchGestureRecognizer:UIPinchGestureRecognizer!
     var zoomVideoPreviewViewPinchGestureRecognizer:UIPinchGestureRecognizer!
-    
+    var maskVideoPreviewViewPanGestureRecognizer:UIPanGestureRecognizer!
     private let sessionQueue = DispatchQueue(label: "session queue",
                                              attributes: [],
                                              target: nil) // Communicate with the session and other session objects on this queue.
     
-    
+    var firstPoint:CGPoint = CGPoint.zero
+    var previousPoint:CGPoint = CGPoint.zero
     var previewLayer:AVCaptureVideoPreviewLayer?
     var captureDevice:AVCaptureDevice?
-    var overlay:UIView? = UIView()
+    //var overlay:UIView? = UIView()
+    var overlay:MaskView!
     var lastPoint = CGPoint.zero
     var image:UIImage!
+    
     
     @IBOutlet weak var imageView: UIImageView!
     
@@ -71,10 +74,13 @@ class ImageViewController: UIViewController {
                         
                         DispatchQueue.main.async {
                             
+                            
                             self.setupMoveGesture()
                             self.videoPreviewView.updateVideoOrientationForDeviceOrientation()
                             self.videoPreviewView.alpha = 1.0
                             self.videoPreviewView.session = self.captureSession
+                            
+                        
                             
                         }
                         
@@ -274,6 +280,7 @@ class ImageViewController: UIViewController {
             deltaScale = min(deltaScale, maxScale/currentScale)
             deltaScale = max(deltaScale, minScale/currentScale)
 
+            
             gestureRecognizer.view?.transform = gestureRecognizer.view!.transform.scaledBy(x:deltaScale, y:deltaScale)
             gestureRecognizer.scale = 1
             
@@ -302,6 +309,27 @@ class ImageViewController: UIViewController {
     }
     
     
+    
+    @objc func handlePan2(_ gestureRecognizer:UIPanGestureRecognizer) {
+        
+        if gestureRecognizer.state == .began {
+             self.firstPoint = gestureRecognizer.location(ofTouch: 0, in: gestureRecognizer.view!)
+        }
+        
+        print("self.firstPoint=\(self.firstPoint)")
+        let point = gestureRecognizer.location(in: gestureRecognizer.view!)
+        
+        
+        
+        
+        let maskView = UIView(frame: CGRect(x: gestureRecognizer.view!.frame.origin.x, y: gestureRecognizer.view!.frame.origin.y, width: self.firstPoint.x, height: self.firstPoint.y))
+        maskView.backgroundColor = UIColor.black
+        videoPreviewView.mask = maskView
+        
+        
+        
+    }
+    
     func setupZoomGesture() {
         zoomVideoPreviewViewPinchGestureRecognizer = UIPinchGestureRecognizer(target: self, action: #selector(ImageViewController.handlePinch2(_:)))
         view.addGestureRecognizer(zoomVideoPreviewViewPinchGestureRecognizer)
@@ -326,6 +354,8 @@ class ImageViewController: UIViewController {
         videoPreviewView.gestureRecognizers = nil
     }
     
+    
+    
 //    func setupGestureRecognizer() {
 //
 //        dragVideoPreviewViewPanGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(ImageViewController.handlePan(_:)))
@@ -341,23 +371,25 @@ class ImageViewController: UIViewController {
         switch sender.selectedSegmentIndex {
         case 0:
                 print("zoom to move")
-                 
-                setupMoveGesture()
+                
+                
                 tearDownZoomGesture()
+                setupMoveGesture()
+                
             break
         case 1:
                 print("move to zoom")
-               
-                setupZoomGesture()
+                
+                
                 tearDownMoveGesture()
+                setupZoomGesture()
+                
+                
             break
+            
         default:
             break
         }
-        
-     
-        
-        
     }
     
     
@@ -383,8 +415,99 @@ class ImageViewController: UIViewController {
     
     
     
+   
     
     
+    
+    var isResizingLR:Bool = false
+    var isResizingUL:Bool = false
+    var isResizingUR:Bool = false
+    var isResizingLL:Bool = false
+    var touchStart:CGPoint = CGPoint.zero
+    let kResizeThumbSize:CGFloat = 45.0
+    
+    
+    
+    
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        
+        if optionSegmentedControl.selectedSegmentIndex == 1 {
+            _ = event?.allTouches?.first!
+            let touchStart = touches.first!.location(in: view)
+            isResizingLR = (videoPreviewView.bounds.size.width - touchStart.x < kResizeThumbSize && videoPreviewView.bounds.size.height - touchStart.y < kResizeThumbSize)
+            isResizingUL = (touchStart.x < kResizeThumbSize && touchStart.y < kResizeThumbSize)
+            isResizingUR = (videoPreviewView.bounds.size.width - touchStart.x < kResizeThumbSize && touchStart.y < kResizeThumbSize)
+            isResizingLL = (touchStart.x < kResizeThumbSize && videoPreviewView.bounds.size.height - touchStart.y < kResizeThumbSize)
+            
+        }
+        
+       
+    }
+    
+    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
+        
+        if optionSegmentedControl.selectedSegmentIndex == 1 {
+            
+            
+            
+            
+            let touchPoint:CGPoint! = touches.first!.location(in: videoPreviewView)
+            let previous:CGPoint! = touches.first!.previousLocation(in: videoPreviewView)
+            
+            let x = videoPreviewView.bounds.origin.x
+            let y = videoPreviewView.bounds.origin.y
+            
+            var frame = CGRect.zero
+            
+            if isResizingLR {
+                
+                frame = CGRect(x: x,
+                               y: y,
+                               width: touchPoint.x,
+                               height: touchPoint.y)
+                
+                videoPreviewView.mask = UIView(frame: frame)
+                
+            }
+            videoPreviewView.mask?.backgroundColor = UIColor.red
+        }
+    }
+    
+    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+        if optionSegmentedControl.selectedSegmentIndex == 1 {
+            previousPoint.x = videoPreviewView.mask!.bounds.origin.x + videoPreviewView.mask!.bounds.width
+            previousPoint.y = videoPreviewView.mask!.bounds.origin.y + videoPreviewView.mask!.bounds.height
+            
+        }
+    }
+    
+    
+    
+    /*
+ 
+     //else if isResizingUL {
+     //                frame = CGRect(x: x+deltaWidth,
+     //                               y: y+deltaHeight,
+     //                               width: width-deltaWidth,
+     //                               height: height-deltaHeight)
+     //                videoPreviewView.mask = UIView(frame: frame)
+     //                print("Upper Left")
+     //            } else if isResizingUR {
+     //                frame = CGRect(x: x,
+     //                               y: y+deltaWidth,
+     //                               width: width+deltaWidth,
+     //                               height: height-deltaHeight)
+     //                videoPreviewView.mask = UIView(frame: frame)
+     //                print("Upper Right")
+     //            } else if isResizingLL {
+     //                frame = CGRect(x: x+deltaWidth,
+     //                               y: y,
+     //                               width: width-deltaWidth,
+     //                               height: height+deltaHeight)
+     //                videoPreviewView.mask = UIView(frame: frame)
+     //                print("Lower Left")
+ 
+     */
 
     
     

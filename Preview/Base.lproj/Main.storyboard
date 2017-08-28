@@ -53,8 +53,8 @@
                                     <constraint firstAttribute="height" constant="27" id="Vyw-9e-vfS"/>
                                 </constraints>
                                 <segments>
-                                    <segment title="Move"/>
-                                    <segment title="Zoom"/>
+                                    <segment title="Macro"/>
+                                    <segment title="Micro"/>
                                 </segments>
                                 <connections>
                                     <action selector="changeOption:" destination="BYZ-38-t0r" eventType="valueChanged" id="JHt-WO-K2a"/>
