@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="13178.6" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="0fo-7e-rqq">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="13189.4" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="0fo-7e-rqq">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13156.2"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13165.3"/>
         <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -55,18 +55,32 @@
                                 <segments>
                                     <segment title="Macro"/>
                                     <segment title="Micro"/>
+                                    <segment title="Focus"/>
                                 </segments>
                                 <connections>
                                     <action selector="changeOption:" destination="BYZ-38-t0r" eventType="valueChanged" id="JHt-WO-K2a"/>
                                 </connections>
                             </segmentedControl>
+                            <button opaque="NO" contentMode="scaleToFill" enabled="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="erS-e9-B4K">
+                                <rect key="frame" x="170" y="577" width="35" height="35"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="35" id="fGz-LM-qbQ"/>
+                                    <constraint firstAttribute="width" constant="35" id="rad-Aq-5Sj"/>
+                                </constraints>
+                                <state key="normal" image="camera-101"/>
+                                <connections>
+                                    <action selector="capturePhoto:" destination="BYZ-38-t0r" eventType="touchUpInside" id="aRa-84-FVx"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstItem="ZEP-hP-eNM" firstAttribute="top" secondItem="8bC-Xf-vdC" secondAttribute="top" id="1Dt-15-ahh"/>
                             <constraint firstItem="ta3-Q4-yc7" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" constant="51" id="7ou-wT-La3"/>
                             <constraint firstItem="ZEP-hP-eNM" firstAttribute="centerY" secondItem="ta3-Q4-yc7" secondAttribute="centerY" id="CIx-MG-yt6"/>
+                            <constraint firstItem="jqt-8s-85W" firstAttribute="top" secondItem="erS-e9-B4K" secondAttribute="bottom" constant="8" symbolic="YES" id="DrO-Jz-7j0"/>
                             <constraint firstItem="ta3-Q4-yc7" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" constant="193" id="EoB-vd-Uhs"/>
+                            <constraint firstItem="erS-e9-B4K" firstAttribute="centerX" secondItem="jqt-8s-85W" secondAttribute="centerX" id="OiJ-0C-OJm"/>
                             <constraint firstItem="ZEP-hP-eNM" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" id="OiS-oH-vLG"/>
                             <constraint firstItem="jqt-8s-85W" firstAttribute="leading" secondItem="ta3-Q4-yc7" secondAttribute="leading" id="cZ4-cs-jjE"/>
                             <constraint firstItem="ZEP-hP-eNM" firstAttribute="centerX" secondItem="ta3-Q4-yc7" secondAttribute="centerX" id="kz5-yl-iLU"/>
@@ -77,6 +91,7 @@
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="cameraButton" destination="erS-e9-B4K" id="dbW-4f-DiD"/>
                         <outlet property="imageView" destination="ZEP-hP-eNM" id="YVy-E8-zfi"/>
                         <outlet property="optionSegmentedControl" destination="jqt-8s-85W" id="1b1-h0-MjX"/>
                         <outlet property="videoPreviewView" destination="ta3-Q4-yc7" id="DWg-68-vLO"/>
@@ -105,4 +120,7 @@
             <point key="canvasLocation" x="200.80000000000001" y="36.431784107946029"/>
         </scene>
     </scenes>
+    <resources>
+        <image name="camera-101" width="100" height="100"/>
+    </resources>
 </document>

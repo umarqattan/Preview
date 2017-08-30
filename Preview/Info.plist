@@ -17,11 +17,13 @@
 	<key>CFBundleShortVersionString</key>
 	<string>1.0</string>
 	<key>CFBundleVersion</key>
-	<string>1.4</string>
+	<string>1.12</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
 	<string>This app will use camera.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>This app will create multiple photos across the background view</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>You can select photos.</string>
 	<key>UILaunchStoryboardName</key>

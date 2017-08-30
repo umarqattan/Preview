@@ -10,10 +10,14 @@ import UIKit
 import AVFoundation
 import Photos
 
-class ImageViewController: UIViewController {
+class ImageViewController: UIViewController, AVCapturePhotoCaptureDelegate {
 
     @IBOutlet weak var videoPreviewView: VideoPreviewView!
     @IBOutlet weak var optionSegmentedControl: UISegmentedControl!
+    
+    
+    
+    
     
     // AVCaptureSession variables and properties
     var captureSession:AVCaptureSession = AVCaptureSession()
@@ -23,6 +27,7 @@ class ImageViewController: UIViewController {
     var scaleVideoPreviewViewPinchGestureRecognizer:UIPinchGestureRecognizer!
     var zoomVideoPreviewViewPinchGestureRecognizer:UIPinchGestureRecognizer!
     var maskVideoPreviewViewPanGestureRecognizer:UIPanGestureRecognizer!
+    var focusVideoPreviewViewTapGestureRecognizer:UITapGestureRecognizer!
     private let sessionQueue = DispatchQueue(label: "session queue",
                                              attributes: [],
                                              target: nil) // Communicate with the session and other session objects on this queue.
@@ -31,13 +36,17 @@ class ImageViewController: UIViewController {
     var previousPoint:CGPoint = CGPoint.zero
     var previewLayer:AVCaptureVideoPreviewLayer?
     var captureDevice:AVCaptureDevice?
-    //var overlay:UIView? = UIView()
     var overlay:MaskView!
     var lastPoint = CGPoint.zero
     var image:UIImage!
     
+    @IBOutlet weak var cameraButton: UIButton!
+    
     
     @IBOutlet weak var imageView: UIImageView!
+    
+    
+    
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
@@ -79,7 +88,7 @@ class ImageViewController: UIViewController {
                             self.videoPreviewView.updateVideoOrientationForDeviceOrientation()
                             self.videoPreviewView.alpha = 1.0
                             self.videoPreviewView.session = self.captureSession
-                            
+                            self.cameraButton.isEnabled = true
                         
                             
                         }
@@ -258,6 +267,84 @@ class ImageViewController: UIViewController {
         
     }
     
+    func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
+        guard let imageData = photo.fileDataRepresentation() else {
+            return
+        }
+        
+        let capturedImage = UIImage.init(data: imageData , scale: 1.0)
+        if let image = capturedImage {
+            // Save our captured image to photos album
+            UIImageWriteToSavedPhotosAlbum(image, nil, nil, nil)
+            DispatchQueue.main.async {
+                let newFrame = CGRect(x: self.videoPreviewView.frame.origin.x,
+                                      y: self.videoPreviewView.frame.origin.y,
+                                      width: self.videoPreviewView.frame.width,
+                                      height: self.videoPreviewView.frame.height)
+                let newImageView = UIImageView(frame: newFrame)
+                newImageView.image = image
+                self.imageView.addSubview(newImageView)
+                
+            }
+        }
+    }
+    
+//    func photoOutput(_ captureOutput: AVCapturePhotoOutput,
+//                     didFinishProcessingPhoto photoSampleBuffer: CMSampleBuffer?,
+//                     previewPhoto previewPhotoSampleBuffer: CMSampleBuffer?,
+//                 resolvedSettings: AVCaptureResolvedPhotoSettings,
+//                 bracketSettings: AVCaptureBracketedStillImageSettings?,
+//                 error: Error?) {
+//
+//        guard error == nil,
+//            let photoSampleBuffer = photoSampleBuffer else {
+//                print("Error capturing photo: \(String(describing: error))")
+//                return
+//        }
+//        // Convert photo same buffer to a jpeg image data by using // AVCapturePhotoOutput
+//        //'jpegPhotoDataRepresentation(forJPEGSampleBuffer:previewPhotoSampleBuffer:)' was deprecated in iOS 11.0: Use -[AVCapturePhoto fileDataRepresentation] instead.
+//
+//        guard let imageData =
+//            AVCapturePhotoOutput.jpegPhotoDataRepresentation(forJPEGSampleBuffer: photoSampleBuffer,
+//                                                             previewPhotoSampleBuffer: previewPhotoSampleBuffer) else {
+//                return
+//        }
+//        // Initialise a UIImage with our image data
+//        let capturedImage = UIImage.init(data: imageData , scale: 1.0)
+//        if let image = capturedImage {
+//            // Save our captured image to photos album
+//            UIImageWriteToSavedPhotosAlbum(image, nil, nil, nil)
+//            DispatchQueue.main.async {
+//                let newFrame = CGRect(x: self.videoPreviewView.frame.origin.x,
+//                                      y: self.videoPreviewView.frame.origin.y,
+//                                      width: self.videoPreviewView.frame.width/2.0,
+//                                      height: self.videoPreviewView.frame.height/2.0)
+//                let newImageView = UIImageView(frame: newFrame)
+//                newImageView.image = image
+//                self.imageView.addSubview(newImageView)
+//
+//                }
+//            }
+//        }
+//
+//
+  
+    @IBAction func capturePhoto(_ sender: UIButton) {
+        
+        let photoSettings = AVCapturePhotoSettings()
+        //photoSettings.isHighResolutionPhotoEnabled = true
+        let device = defaultDevice()
+        if device.isFlashAvailable {
+            photoSettings.flashMode = .auto
+        }
+//        if !photoSettings.availablePreviewPhotoPixelFormatTypes.isEmpty {
+//            photoSettings.previewPhotoFormat = [kCVPixelBufferPixelFormatTypeKey as String: photoSettings.availablePreviewPhotoPixelFormatTypes.first!]
+//        }
+        capturePhotoOutput.capturePhoto(with: photoSettings, delegate: self)
+        
+    }
+    
+    
     @objc func handlePan(_ gestureRecognizer:UIPanGestureRecognizer) {
         if gestureRecognizer.state == .began || gestureRecognizer.state == .changed {
             let translation = gestureRecognizer.translation(in: view)
@@ -317,7 +404,7 @@ class ImageViewController: UIViewController {
         }
         
         print("self.firstPoint=\(self.firstPoint)")
-        let point = gestureRecognizer.location(in: gestureRecognizer.view!)
+        //let point = gestureRecognizer.location(in: gestureRecognizer.view!)
         
         
         
@@ -326,8 +413,58 @@ class ImageViewController: UIViewController {
         maskView.backgroundColor = UIColor.black
         videoPreviewView.mask = maskView
         
-        
-        
+    }
+    
+    @objc func focusAndExposeTap(_ gestureRecognizer: UITapGestureRecognizer) {
+        let devicePoint = self.videoPreviewView.videoPreviewLayer.captureDevicePointConverted(fromLayerPoint: gestureRecognizer.location(in: gestureRecognizer.view))
+        focus(with: .autoFocus, exposureMode: .autoExpose, at: devicePoint, monitorSubjectAreaChange: true)
+    }
+    
+    private func focus(with focusMode: AVCaptureDevice.FocusMode, exposureMode: AVCaptureDevice.ExposureMode, at devicePoint: CGPoint, monitorSubjectAreaChange: Bool) {
+        sessionQueue.async { [unowned self] in
+            let device = self.defaultDevice()
+            do {
+                try device.lockForConfiguration()
+                
+                /*
+                 Setting (focus/exposure)PointOfInterest alone does not initiate a (focus/exposure) operation.
+                 Call set(Focus/Exposure)Mode() to apply the new point of interest.
+                 */
+                if device.isFocusPointOfInterestSupported && device.isFocusModeSupported(focusMode) {
+                    device.focusPointOfInterest = devicePoint
+                    device.focusMode = focusMode
+                }
+                
+                if device.isExposurePointOfInterestSupported && device.isExposureModeSupported(exposureMode) {
+                    device.exposurePointOfInterest = devicePoint
+                    device.exposureMode = exposureMode
+                }
+                
+                device.isSubjectAreaChangeMonitoringEnabled = monitorSubjectAreaChange
+                device.unlockForConfiguration()
+            } catch {
+                print("Could not lock device for configuration: \(error)")
+            }
+        }
+    }
+    
+    
+    // MARK: FOCUS
+    func setupFocusGesture() {
+        focusVideoPreviewViewTapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(ImageViewController.focusAndExposeTap(_:)))
+        videoPreviewView.addGestureRecognizer(focusVideoPreviewViewTapGestureRecognizer)
+    }
+    
+   
+    
+    
+    // MARK: MICRO
+    
+   
+    
+    func tearDownGestures() {
+        view.gestureRecognizers = nil
+        videoPreviewView.gestureRecognizers = nil
     }
     
     func setupZoomGesture() {
@@ -335,6 +472,7 @@ class ImageViewController: UIViewController {
         view.addGestureRecognizer(zoomVideoPreviewViewPinchGestureRecognizer)
     }
     
+    // MARK: MACRO
     func setupMoveGesture() {
         dragVideoPreviewViewPanGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(ImageViewController.handlePan(_:)))
         scaleVideoPreviewViewPinchGestureRecognizer = UIPinchGestureRecognizer(target: self, action: #selector(ImageViewController.handlePinch(_ :)))
@@ -342,50 +480,33 @@ class ImageViewController: UIViewController {
         videoPreviewView.addGestureRecognizer(dragVideoPreviewViewPanGestureRecognizer)
         videoPreviewView.addGestureRecognizer(scaleVideoPreviewViewPinchGestureRecognizer)
     }
-    
-    func tearDownZoomGesture() {
-        
-        view.gestureRecognizers = nil
-       
-    }
-    
-    func tearDownMoveGesture() {
-        
-        videoPreviewView.gestureRecognizers = nil
-    }
-    
-    
-    
-//    func setupGestureRecognizer() {
-//
-//        dragVideoPreviewViewPanGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(ImageViewController.handlePan(_:)))
-//        scaleVideoPreviewViewPinchGestureRecognizer = UIPinchGestureRecognizer(target: self, action: #selector(ImageViewController.handlePinch(_ :)))
-//
-//        videoPreviewView.addGestureRecognizer(dragVideoPreviewViewPanGestureRecognizer)
-//        videoPreviewView.addGestureRecognizer(scaleVideoPreviewViewPinchGestureRecognizer)
-//
-//    }
+
 
     @IBAction func changeOption(_ sender: UISegmentedControl) {
         
         switch sender.selectedSegmentIndex {
         case 0:
-                print("zoom to move")
+                print("...to macro")
                 
                 
-                tearDownZoomGesture()
+                tearDownGestures()
                 setupMoveGesture()
                 
             break
         case 1:
-                print("move to zoom")
+                print("... to micro")
                 
-                
-                tearDownMoveGesture()
+                tearDownGestures()
                 setupZoomGesture()
                 
                 
             break
+        case 2:
+            print("...to focus")
+            
+            
+            tearDownGestures()
+            setupFocusGesture()
             
         default:
             break
@@ -452,7 +573,6 @@ class ImageViewController: UIViewController {
             
             
             let touchPoint:CGPoint! = touches.first!.location(in: videoPreviewView)
-            let previous:CGPoint! = touches.first!.previousLocation(in: videoPreviewView)
             
             let x = videoPreviewView.bounds.origin.x
             let y = videoPreviewView.bounds.origin.y
@@ -473,42 +593,6 @@ class ImageViewController: UIViewController {
         }
     }
     
-    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-        if optionSegmentedControl.selectedSegmentIndex == 1 {
-            previousPoint.x = videoPreviewView.mask!.bounds.origin.x + videoPreviewView.mask!.bounds.width
-            previousPoint.y = videoPreviewView.mask!.bounds.origin.y + videoPreviewView.mask!.bounds.height
-            
-        }
-    }
-    
-    
-    
-    /*
- 
-     //else if isResizingUL {
-     //                frame = CGRect(x: x+deltaWidth,
-     //                               y: y+deltaHeight,
-     //                               width: width-deltaWidth,
-     //                               height: height-deltaHeight)
-     //                videoPreviewView.mask = UIView(frame: frame)
-     //                print("Upper Left")
-     //            } else if isResizingUR {
-     //                frame = CGRect(x: x,
-     //                               y: y+deltaWidth,
-     //                               width: width+deltaWidth,
-     //                               height: height-deltaHeight)
-     //                videoPreviewView.mask = UIView(frame: frame)
-     //                print("Upper Right")
-     //            } else if isResizingLL {
-     //                frame = CGRect(x: x+deltaWidth,
-     //                               y: y,
-     //                               width: width-deltaWidth,
-     //                               height: height+deltaHeight)
-     //                videoPreviewView.mask = UIView(frame: frame)
-     //                print("Lower Left")
- 
-     */
-
     
     
     
