@@ -14,11 +14,7 @@ class ImageViewController: UIViewController, AVCapturePhotoCaptureDelegate {
 
     @IBOutlet weak var videoPreviewView: VideoPreviewView!
     @IBOutlet weak var optionSegmentedControl: UISegmentedControl!
-    
-    
-    
-    
-    
+
     // AVCaptureSession variables and properties
     var captureSession:AVCaptureSession = AVCaptureSession()
     var capturePhotoOutput = AVCapturePhotoOutput()
@@ -28,6 +24,7 @@ class ImageViewController: UIViewController, AVCapturePhotoCaptureDelegate {
     var zoomVideoPreviewViewPinchGestureRecognizer:UIPinchGestureRecognizer!
     var maskVideoPreviewViewPanGestureRecognizer:UIPanGestureRecognizer!
     var focusVideoPreviewViewTapGestureRecognizer:UITapGestureRecognizer!
+    var rotateVideoPreviewViewRotationGestureRecognizer:UIRotationGestureRecognizer!
     private let sessionQueue = DispatchQueue(label: "session queue",
                                              attributes: [],
                                              target: nil) // Communicate with the session and other session objects on this queue.
@@ -36,21 +33,16 @@ class ImageViewController: UIViewController, AVCapturePhotoCaptureDelegate {
     var previousPoint:CGPoint = CGPoint.zero
     var previewLayer:AVCaptureVideoPreviewLayer?
     var captureDevice:AVCaptureDevice?
-    var overlay:MaskView!
     var lastPoint = CGPoint.zero
     var image:UIImage!
     
     @IBOutlet weak var cameraButton: UIButton!
-    
-    
     @IBOutlet weak var imageView: UIImageView!
-    
-    
-    
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
+        imageView.contentMode = .scaleAspectFit
         imageView.image = image
         
         if self.isCaptureSessionConfigured {
@@ -117,14 +109,6 @@ class ImageViewController: UIViewController, AVCapturePhotoCaptureDelegate {
     
         navigationController?.isNavigationBarHidden = true
         
-        /**
-         
-        overlay?.layer.borderColor = UIColor.black.cgColor
-        overlay?.backgroundColor = UIColor.lightGray.withAlphaComponent(0.6)
-        overlay?.isHidden = true
-        self.imageView.addSubview(overlay!)
-         
-        */
     }
     
     func checkCameraAuthorization(_ completionHandler: @escaping ((_ authorized: Bool) -> Void)) {
@@ -277,57 +261,29 @@ class ImageViewController: UIViewController, AVCapturePhotoCaptureDelegate {
             // Save our captured image to photos album
             UIImageWriteToSavedPhotosAlbum(image, nil, nil, nil)
             DispatchQueue.main.async {
+                
                 let newFrame = CGRect(x: self.videoPreviewView.frame.origin.x,
                                       y: self.videoPreviewView.frame.origin.y,
                                       width: self.videoPreviewView.frame.width,
                                       height: self.videoPreviewView.frame.height)
+ 
                 let newImageView = UIImageView(frame: newFrame)
+                
+                
+                
+                
                 newImageView.image = image
+                
+                
+                newImageView.frame = self.videoPreviewView.frame
+                newImageView.layer.setAffineTransform((self.rotateVideoPreviewViewRotationGestureRecognizer.view?.transform)!)
+                newImageView.contentMode = .scaleAspectFit
+                
                 self.imageView.addSubview(newImageView)
                 
             }
         }
     }
-    
-//    func photoOutput(_ captureOutput: AVCapturePhotoOutput,
-//                     didFinishProcessingPhoto photoSampleBuffer: CMSampleBuffer?,
-//                     previewPhoto previewPhotoSampleBuffer: CMSampleBuffer?,
-//                 resolvedSettings: AVCaptureResolvedPhotoSettings,
-//                 bracketSettings: AVCaptureBracketedStillImageSettings?,
-//                 error: Error?) {
-//
-//        guard error == nil,
-//            let photoSampleBuffer = photoSampleBuffer else {
-//                print("Error capturing photo: \(String(describing: error))")
-//                return
-//        }
-//        // Convert photo same buffer to a jpeg image data by using // AVCapturePhotoOutput
-//        //'jpegPhotoDataRepresentation(forJPEGSampleBuffer:previewPhotoSampleBuffer:)' was deprecated in iOS 11.0: Use -[AVCapturePhoto fileDataRepresentation] instead.
-//
-//        guard let imageData =
-//            AVCapturePhotoOutput.jpegPhotoDataRepresentation(forJPEGSampleBuffer: photoSampleBuffer,
-//                                                             previewPhotoSampleBuffer: previewPhotoSampleBuffer) else {
-//                return
-//        }
-//        // Initialise a UIImage with our image data
-//        let capturedImage = UIImage.init(data: imageData , scale: 1.0)
-//        if let image = capturedImage {
-//            // Save our captured image to photos album
-//            UIImageWriteToSavedPhotosAlbum(image, nil, nil, nil)
-//            DispatchQueue.main.async {
-//                let newFrame = CGRect(x: self.videoPreviewView.frame.origin.x,
-//                                      y: self.videoPreviewView.frame.origin.y,
-//                                      width: self.videoPreviewView.frame.width/2.0,
-//                                      height: self.videoPreviewView.frame.height/2.0)
-//                let newImageView = UIImageView(frame: newFrame)
-//                newImageView.image = image
-//                self.imageView.addSubview(newImageView)
-//
-//                }
-//            }
-//        }
-//
-//
   
     @IBAction func capturePhoto(_ sender: UIButton) {
         
@@ -337,9 +293,9 @@ class ImageViewController: UIViewController, AVCapturePhotoCaptureDelegate {
         if device.isFlashAvailable {
             photoSettings.flashMode = .auto
         }
-//        if !photoSettings.availablePreviewPhotoPixelFormatTypes.isEmpty {
-//            photoSettings.previewPhotoFormat = [kCVPixelBufferPixelFormatTypeKey as String: photoSettings.availablePreviewPhotoPixelFormatTypes.first!]
-//        }
+        if !photoSettings.availablePreviewPhotoPixelFormatTypes.isEmpty {
+            photoSettings.previewPhotoFormat = [kCVPixelBufferPixelFormatTypeKey as String: photoSettings.availablePreviewPhotoPixelFormatTypes.first!]
+        }
         capturePhotoOutput.capturePhoto(with: photoSettings, delegate: self)
         
     }
@@ -354,23 +310,23 @@ class ImageViewController: UIViewController, AVCapturePhotoCaptureDelegate {
     }
     
     @objc func handlePinch(_ gestureRecognizer:UIPinchGestureRecognizer) {
+        
+        
         if gestureRecognizer.state == .began || gestureRecognizer.state == .changed {
-            let currentScale:CGFloat = gestureRecognizer.view?.layer.value(forKeyPath: "transform.scale.x") as! CGFloat
-            
-            let minScale:CGFloat = 0.15
-            let maxScale:CGFloat = 2.0
-            let zoomSpeed:CGFloat = 0.5
-            
-            var deltaScale:CGFloat = gestureRecognizer.scale
-            
-            deltaScale = ((deltaScale - 1)*zoomSpeed) + 1
-            deltaScale = min(deltaScale, maxScale/currentScale)
-            deltaScale = max(deltaScale, minScale/currentScale)
-
-            
-            gestureRecognizer.view?.transform = gestureRecognizer.view!.transform.scaledBy(x:deltaScale, y:deltaScale)
+//            let currentScale:CGFloat = gestureRecognizer.view?.layer.value(forKeyPath: "transform.scale.x") as! CGFloat
+//
+//            let minScale:CGFloat = 0.15
+//            let maxScale:CGFloat = 2.0
+//            let zoomSpeed:CGFloat = 0.5
+//
+//            var deltaScale:CGFloat = gestureRecognizer.scale
+//
+//            deltaScale = ((deltaScale - 1)*zoomSpeed) + 1
+//            deltaScale = min(deltaScale, maxScale/currentScale)
+//            deltaScale = max(deltaScale, minScale/currentScale)
+            // TODO: Fix Scale
+            gestureRecognizer.view?.transform = gestureRecognizer.view!.transform.scaledBy(x:gestureRecognizer.scale, y:gestureRecognizer.scale)
             gestureRecognizer.scale = 1
-            
         }
         
     }
@@ -395,19 +351,22 @@ class ImageViewController: UIViewController, AVCapturePhotoCaptureDelegate {
         }
     }
     
-    
-    
+    @objc func handleRotation(_ gestureRecognizer:UIRotationGestureRecognizer) {
+        if gestureRecognizer.state == .began || gestureRecognizer.state == .changed {
+            
+            gestureRecognizer.view?.transform = gestureRecognizer.view!.transform.rotated(by: gestureRecognizer.rotation)
+            self.videoPreviewView.videoPreviewLayer.setAffineTransform((gestureRecognizer.view?.transform)!)
+            gestureRecognizer.rotation = 0
+            
+        }
+        
+    }
+
     @objc func handlePan2(_ gestureRecognizer:UIPanGestureRecognizer) {
         
         if gestureRecognizer.state == .began {
              self.firstPoint = gestureRecognizer.location(ofTouch: 0, in: gestureRecognizer.view!)
         }
-        
-        print("self.firstPoint=\(self.firstPoint)")
-        //let point = gestureRecognizer.location(in: gestureRecognizer.view!)
-        
-        
-        
         
         let maskView = UIView(frame: CGRect(x: gestureRecognizer.view!.frame.origin.x, y: gestureRecognizer.view!.frame.origin.y, width: self.firstPoint.x, height: self.firstPoint.y))
         maskView.backgroundColor = UIColor.black
@@ -415,6 +374,7 @@ class ImageViewController: UIViewController, AVCapturePhotoCaptureDelegate {
         
     }
     
+    // TODO: Make MANUAL FOCUS
     @objc func focusAndExposeTap(_ gestureRecognizer: UITapGestureRecognizer) {
         let devicePoint = self.videoPreviewView.videoPreviewLayer.captureDevicePointConverted(fromLayerPoint: gestureRecognizer.location(in: gestureRecognizer.view))
         focus(with: .autoFocus, exposureMode: .autoExpose, at: devicePoint, monitorSubjectAreaChange: true)
@@ -448,19 +408,13 @@ class ImageViewController: UIViewController, AVCapturePhotoCaptureDelegate {
         }
     }
     
-    
     // MARK: FOCUS
     func setupFocusGesture() {
         focusVideoPreviewViewTapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(ImageViewController.focusAndExposeTap(_:)))
         videoPreviewView.addGestureRecognizer(focusVideoPreviewViewTapGestureRecognizer)
     }
-    
-   
-    
-    
+
     // MARK: MICRO
-    
-   
     
     func tearDownGestures() {
         view.gestureRecognizers = nil
@@ -476,11 +430,13 @@ class ImageViewController: UIViewController, AVCapturePhotoCaptureDelegate {
     func setupMoveGesture() {
         dragVideoPreviewViewPanGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(ImageViewController.handlePan(_:)))
         scaleVideoPreviewViewPinchGestureRecognizer = UIPinchGestureRecognizer(target: self, action: #selector(ImageViewController.handlePinch(_ :)))
+        rotateVideoPreviewViewRotationGestureRecognizer = UIRotationGestureRecognizer(target: self, action: #selector(ImageViewController.handleRotation(_:)))
+        
         
         videoPreviewView.addGestureRecognizer(dragVideoPreviewViewPanGestureRecognizer)
         videoPreviewView.addGestureRecognizer(scaleVideoPreviewViewPinchGestureRecognizer)
+        videoPreviewView.addGestureRecognizer(rotateVideoPreviewViewRotationGestureRecognizer)
     }
-
 
     @IBAction func changeOption(_ sender: UISegmentedControl) {
         
@@ -513,7 +469,6 @@ class ImageViewController: UIViewController, AVCapturePhotoCaptureDelegate {
         }
     }
     
-    
     @IBAction func zoom(_ sender: UISlider) {
         
         var device = defaultDevice()
@@ -533,22 +488,13 @@ class ImageViewController: UIViewController, AVCapturePhotoCaptureDelegate {
             
         }
     }
-    
-    
-    
-   
-    
-    
-    
+
     var isResizingLR:Bool = false
     var isResizingUL:Bool = false
     var isResizingUR:Bool = false
     var isResizingLL:Bool = false
     var touchStart:CGPoint = CGPoint.zero
     let kResizeThumbSize:CGFloat = 45.0
-    
-    
-    
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         

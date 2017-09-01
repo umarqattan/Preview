@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		E1A930B81F41288700AFC907 /* HomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A930B71F41288700AFC907 /* HomeViewController.swift */; };
 		E1BB21291F44E4F60087BC5F /* VideoPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1BB21281F44E4F60087BC5F /* VideoPreviewView.swift */; };
-		E1BFA7E61F5116F900E2E5F4 /* OverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1BFA7E51F5116F900E2E5F4 /* OverlayView.swift */; };
 		E1C384B21F3FC49D00CDC8ED /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1C384B11F3FC49D00CDC8ED /* AppDelegate.swift */; };
 		E1C384B41F3FC49D00CDC8ED /* ImageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1C384B31F3FC49D00CDC8ED /* ImageViewController.swift */; };
 		E1C384B71F3FC49D00CDC8ED /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E1C384B51F3FC49D00CDC8ED /* Main.storyboard */; };
@@ -20,7 +19,6 @@
 /* Begin PBXFileReference section */
 		E1A930B71F41288700AFC907 /* HomeViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HomeViewController.swift; sourceTree = "<group>"; };
 		E1BB21281F44E4F60087BC5F /* VideoPreviewView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VideoPreviewView.swift; sourceTree = "<group>"; };
-		E1BFA7E51F5116F900E2E5F4 /* OverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverlayView.swift; sourceTree = "<group>"; };
 		E1C384AE1F3FC49D00CDC8ED /* Preview.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Preview.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E1C384B11F3FC49D00CDC8ED /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		E1C384B31F3FC49D00CDC8ED /* ImageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageViewController.swift; sourceTree = "<group>"; };
@@ -77,7 +75,6 @@
 				E1C384BA1F3FC49D00CDC8ED /* LaunchScreen.storyboard */,
 				E1C384BD1F3FC49D00CDC8ED /* Info.plist */,
 				E1BB21281F44E4F60087BC5F /* VideoPreviewView.swift */,
-				E1BFA7E51F5116F900E2E5F4 /* OverlayView.swift */,
 			);
 			path = Preview;
 			sourceTree = "<group>";
@@ -215,7 +212,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E1BFA7E61F5116F900E2E5F4 /* OverlayView.swift in Sources */,
 				E1C384B41F3FC49D00CDC8ED /* ImageViewController.swift in Sources */,
 				E1BB21291F44E4F60087BC5F /* VideoPreviewView.swift in Sources */,
 				E1C384B21F3FC49D00CDC8ED /* AppDelegate.swift in Sources */,

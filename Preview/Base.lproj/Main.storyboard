@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="13189.4" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="0fo-7e-rqq">
-    <device id="retina4_7" orientation="portrait">
+    <device id="retina5_5" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
@@ -18,7 +18,7 @@
                         <viewControllerLayoutGuide type="bottom" id="GZz-yv-qwx"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="dfE-HC-Qv7">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="736"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                     </view>
@@ -37,18 +37,18 @@
                         <viewControllerLayoutGuide type="bottom" id="wfy-db-euE"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="736"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="ZEP-hP-eNM">
-                                <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                                <rect key="frame" x="0.0" y="0.0" width="414" height="736"/>
                             </imageView>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ta3-Q4-yc7" customClass="VideoPreviewView" customModule="Preview" customModuleProvider="target">
-                                <rect key="frame" x="67" y="213" width="240" height="240"/>
+                                <rect key="frame" x="71" y="213" width="271" height="309"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                             </view>
                             <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="jqt-8s-85W">
-                                <rect key="frame" x="67" y="620" width="240" height="28"/>
+                                <rect key="frame" x="71" y="689" width="271" height="28"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="27" id="Vyw-9e-vfS"/>
                                 </constraints>
@@ -62,7 +62,7 @@
                                 </connections>
                             </segmentedControl>
                             <button opaque="NO" contentMode="scaleToFill" enabled="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="erS-e9-B4K">
-                                <rect key="frame" x="170" y="577" width="35" height="35"/>
+                                <rect key="frame" x="189" y="646" width="35" height="35"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="35" id="fGz-LM-qbQ"/>
                                     <constraint firstAttribute="width" constant="35" id="rad-Aq-5Sj"/>
@@ -76,16 +76,16 @@
                         <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstItem="ZEP-hP-eNM" firstAttribute="top" secondItem="8bC-Xf-vdC" secondAttribute="top" id="1Dt-15-ahh"/>
-                            <constraint firstItem="ta3-Q4-yc7" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" constant="51" id="7ou-wT-La3"/>
-                            <constraint firstItem="ZEP-hP-eNM" firstAttribute="centerY" secondItem="ta3-Q4-yc7" secondAttribute="centerY" id="CIx-MG-yt6"/>
+                            <constraint firstItem="ta3-Q4-yc7" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" constant="193" id="A5M-lh-sRv"/>
                             <constraint firstItem="jqt-8s-85W" firstAttribute="top" secondItem="erS-e9-B4K" secondAttribute="bottom" constant="8" symbolic="YES" id="DrO-Jz-7j0"/>
-                            <constraint firstItem="ta3-Q4-yc7" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" constant="193" id="EoB-vd-Uhs"/>
                             <constraint firstItem="erS-e9-B4K" firstAttribute="centerX" secondItem="jqt-8s-85W" secondAttribute="centerX" id="OiJ-0C-OJm"/>
                             <constraint firstItem="ZEP-hP-eNM" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" id="OiS-oH-vLG"/>
-                            <constraint firstItem="jqt-8s-85W" firstAttribute="leading" secondItem="ta3-Q4-yc7" secondAttribute="leading" id="cZ4-cs-jjE"/>
-                            <constraint firstItem="ZEP-hP-eNM" firstAttribute="centerX" secondItem="ta3-Q4-yc7" secondAttribute="centerX" id="kz5-yl-iLU"/>
+                            <constraint firstItem="ta3-Q4-yc7" firstAttribute="trailing" secondItem="jqt-8s-85W" secondAttribute="trailing" id="WMt-jP-RYX"/>
+                            <constraint firstItem="ta3-Q4-yc7" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="aaS-Sy-bQe"/>
+                            <constraint firstItem="ta3-Q4-yc7" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" constant="51" id="fhY-Fs-xdT"/>
+                            <constraint firstItem="ta3-Q4-yc7" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerY" id="gCk-8n-2He"/>
+                            <constraint firstItem="ta3-Q4-yc7" firstAttribute="leading" secondItem="jqt-8s-85W" secondAttribute="leading" id="jR5-s8-HRf"/>
                             <constraint firstAttribute="trailing" secondItem="ZEP-hP-eNM" secondAttribute="trailing" id="lSQ-DX-Qaw"/>
-                            <constraint firstItem="jqt-8s-85W" firstAttribute="trailing" secondItem="ta3-Q4-yc7" secondAttribute="trailing" id="luE-QH-AtF"/>
                             <constraint firstItem="ZEP-hP-eNM" firstAttribute="bottom" secondItem="wfy-db-euE" secondAttribute="top" id="ouI-C1-KtN"/>
                             <constraint firstAttribute="bottom" secondItem="jqt-8s-85W" secondAttribute="bottom" constant="20" symbolic="YES" id="tO3-c6-qjQ"/>
                         </constraints>
@@ -107,7 +107,7 @@
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="0fo-7e-rqq" sceneMemberID="viewController">
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="o6c-ic-X4t">
-                        <rect key="frame" x="0.0" y="20" width="375" height="44"/>
+                        <rect key="frame" x="0.0" y="20" width="414" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
                     <nil name="viewControllers"/>
